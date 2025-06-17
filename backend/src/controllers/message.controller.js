@@ -62,25 +62,4 @@ export const sendMessage = async (req, res) => {
   }
 };
 
-export const deleteMessage = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const message = await Message.findById(id);
 
-    if (!message) {
-      return res.status(404).json({ error: "Message not found" });
-    }
-
-    // Optional: Allow only sender to delete the message
-    if (message.senderId.toString() !== req.user._id.toString()) {
-      return res.status(403).json({ error: "You are not allowed to delete this message" });
-    }
-
-    await Message.findByIdAndDelete(id);
-
-    res.status(200).json({ message: "Message deleted successfully" });
-  } catch (error) {
-    console.log("Error in deleteMessage controller: ", error.message);
-    res.status(500).json({ error: "Internal server error" });
-  }
-};
