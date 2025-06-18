@@ -5,7 +5,6 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import path from "path";
 import { connectDB } from "./lib/db.js";
-
 import authRoutes from "./routes/auth.route.js";
 import messageRoutes from "./routes/message.route.js";
 import { initSocket } from "./lib/socket.js";
@@ -16,7 +15,7 @@ const __dirname = path.resolve();
 
 const app = express();
 const server = http.createServer(app);
-initSocket(server); // 👈 initialize socket server with same Express server
+initSocket(server);
 
 app.use(express.json());
 app.use(cookieParser());
@@ -33,8 +32,10 @@ app.use("/api/messages", messageRoutes);
 
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "../frontend/dist")));
-  app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html"));
+
+  // ✅ FIXED: safer path resolution
+  app.get("/*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "../frontend/dist/index.html"));
   });
 }
 
